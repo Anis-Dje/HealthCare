@@ -4,24 +4,14 @@ require_once 'connection.php';
 $doctors = [];
 
 try {
-    $stmt = $pdo->query("SELECT name, specialty, bio, credentials FROM doctors ORDER BY id ASC");
-    $doctors = $stmt->fetchAll();
+    $stmt = $pdo->query("SELECT name, specialty, bio, credentials, image_url FROM doctors ORDER BY id ASC");
+    $doctors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $doctors = [];
 }
 
-// Map doctor names to their existing image URLs
-$doctorImages = [
-    'Dr. Moujib Ourzifi' => 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=500&h=600&fit=crop',
-    'Dr. Bouafia Yousra' => 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=500&h=600&fit=crop',
-    'Dr. Youcef Ait Nouri' => 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=500&h=600&fit=crop',
-    'Dr. Maria Benazzouz' => 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=500&h=600&fit=crop',
-    'Dr. Dahmen Djeghri' => 'https://images.unsplash.com/photo-1637059824899-a441006a6875?q=80&w=752&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'Dr. Mohamed Bicha' => 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=500&h=600&q=80&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'Dr. Bennacer Skander' => 'https://hips.hearstapps.com/hmg-prod/images/portrait-of-a-happy-young-doctor-in-his-clinic-royalty-free-image-1661432441.jpg?crop=0.66698xw:1xh;center,top&resize=640:*',
-    'Dr. Ibtissem Adem' => 'https://img.freepik.com/premium-photo/portrait-glad-smiling-doctor-white-uniform-standing-with-crossed-hands-white_168410-786.jpg',
-    'Dr. Mejdoub Mustapha' => 'https://cdn.prod.website-files.com/62d4f06f9c1357a606c3b7ef/65ddf3cdf19abaf5688af2f8_shutterstock_1933145801%20(1).jpg',
-];
+// Default image if none is set in the database
+$defaultDoctorImage = 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=500&h=600&q=80';
 ?>
 
 <!DOCTYPE html>
@@ -129,8 +119,8 @@ $doctorImages = [
                     $specialty = htmlspecialchars($doctor['specialty'], ENT_QUOTES, 'UTF-8');
                     $bio = htmlspecialchars($doctor['bio'], ENT_QUOTES, 'UTF-8');
                     $credentials = htmlspecialchars($doctor['credentials'], ENT_QUOTES, 'UTF-8');
-                    $imageUrl = $doctorImages[$doctor['name']] ?? 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=500&h=600&q=80';
-                    $imageUrl = htmlspecialchars($imageUrl, ENT_QUOTES, 'UTF-8');
+                    $rawImageUrl = !empty($doctor['image_url']) ? $doctor['image_url'] : $defaultDoctorImage;
+                    $imageUrl = htmlspecialchars($rawImageUrl, ENT_QUOTES, 'UTF-8');
                     ?>
                     <div class="col-md-4">
                         <div class="doctor-card">
