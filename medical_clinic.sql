@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3311
--- Generation Time: Dec 27, 2025 at 11:44 PM
+-- Generation Time: Jan 05, 2026 at 06:18 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -52,9 +52,7 @@ CREATE TABLE `appointments` (
 --
 
 INSERT INTO `appointments` (`id`, `first_name`, `last_name`, `birthdate`, `gender`, `requested_service`, `preferred_date`, `preferred_time`, `email`, `phone`, `address`, `allergies_history`, `selected_doctor`, `medical_file`, `created_at`, `updated_at`, `status`) VALUES
-(1, 'Anis', 'MOhamed', '2025-12-16', 'Male', 'general', '2025-12-27', '00:00:00', 'anisleprince2005@gmail.com', '(055) 499-7155', 'cite sakiet sidi youcef bt 1002 n1488', 'dgqereqrg', 'Dr. Moujib Ourzifi', 'uploads/1766863616_images.jpg', '2025-12-27 20:26:56', '2025-12-27 20:26:56', 'Pending'),
-(2, 'Anis', 'MOhamed', '2025-12-15', 'Male', 'general', '2025-12-27', '00:00:00', 'anisleprince2005@gmail.com', '(055) 499-7155', 'cite sakiet sidi youcef bt 1002 n1488', 'sddfefqef', 'Dr. Moujib Ourzifi', 'uploads/1766874989_BBB6RBETJZE4RH5L4OO6ZYUT7Y.jpg', '2025-12-27 23:36:29', '2025-12-27 23:36:29', 'Pending'),
-(3, 'Anis', 'MOhamed', '2025-12-15', 'Male', 'general', '2025-12-27', '00:00:00', 'anisleprince2005@gmail.com', '(055) 499-7155', 'cite sakiet sidi youcef bt 1002 n1488', 'sddfefqef', 'Dr. Moujib Ourzifi', 'uploads/1766875022_BBB6RBETJZE4RH5L4OO6ZYUT7Y.jpg', '2025-12-27 23:37:02', '2025-12-27 23:37:02', 'Pending');
+(1, 'Anis', 'MOhamed', '2025-12-16', 'Male', 'general', '2025-12-27', '00:00:00', 'anisleprince2005@gmail.com', '(055) 499-7155', 'cite sakiet sidi youcef bt 1002 n1488', 'dgqereqrg', 'Dr. Moujib Ourzifi', 'uploads/1766863616_images.jpg', '2025-12-27 20:26:56', '2025-12-28 00:29:33', 'Confirmed');
 
 -- --------------------------------------------------------
 
@@ -75,7 +73,7 @@ CREATE TABLE `authentication` (
 --
 
 INSERT INTO `authentication` (`id`, `username`, `password_hash`, `created_at`, `updated_at`) VALUES
-(1, 'anis@gmail.com', '$2y$10$XVCdrQnSssNf.L8HOStXYedxewGFv8xDxNFKOOIZVcr4iCUascdCW', '2025-12-26 22:33:14', '2025-12-26 22:33:14');
+(1, 'anis@gmail.com', '$2y$10$ZRmfDpOihZ.83RDt4CJFMu8znhNBhMzZ9kg2UHZONLgnln5HIBQva', '2025-12-26 22:33:14', '2025-12-28 01:01:33');
 
 --
 -- Indexes for dumped tables

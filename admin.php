@@ -151,7 +151,7 @@ $statusClassMap = [
             <div class="ms-auto d-flex align-items-center gap-4">
                 <div class="d-none d-md-flex align-items-center gap-2 text-end">
                     <div>
-                        <p class="mb-0 fw-bold text-dark" style="font-size: 14px;">Dr. Sarah Wilson</p>
+                        <p class="mb-0 fw-bold text-dark" style="font-size: 14px;">Dr. Youcef Ait Nouri</p>
                         <p class="mb-0 text-muted" style="font-size: 11px;">Chief Administrator</p>
                     </div>
                 </div>
