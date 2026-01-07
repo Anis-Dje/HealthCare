@@ -7,6 +7,50 @@ if (empty($_SESSION['user_id'])) {
 
 require_once 'connection.php';
 
+// Registration feedback variables
+$registerError = '';
+$registerSuccess = '';
+
+// Handle Register New Admin submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_admin'])) {
+    try {
+        $username = trim($_POST['reg_username'] ?? '');
+        $regPassword = $_POST['reg_password'] ?? '';
+        $regConfirmPassword = $_POST['reg_confirm_password'] ?? '';
+
+        // Validation
+        if (empty($username) || empty($regPassword)) {
+            $registerError = 'All fields are required.';
+        } elseif ($regPassword !== $regConfirmPassword) {
+            $registerError = 'Password and confirmation do not match.';
+        } elseif (strlen($regPassword) < 4) {
+            $registerError = 'Password must be at least 4 characters long.';
+        } else {
+            // Check if username already exists
+            $checkStmt = $pdo->prepare('SELECT COUNT(*) FROM authentication WHERE username = ?');
+            $checkStmt->execute([$username]);
+            $existingCount = (int) $checkStmt->fetchColumn();
+
+            if ($existingCount > 0) {
+                $registerError = 'Username already exists.';
+            } else {
+                // Insert new admin user
+                $passwordHash = password_hash($regPassword, PASSWORD_DEFAULT);
+                $insertStmt = $pdo->prepare('INSERT INTO authentication (username, password_hash, created_at) VALUES (?, ?, NOW())');
+                $insertStmt->execute([$username, $passwordHash]);
+
+                $registerSuccess = 'Admin user registered successfully!';
+                // Redirect to clear form
+                header('Location: medical-team.php?registered=1');
+                exit;
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('Registration error: ' . $e->getMessage());
+        $registerError = 'An unexpected error occurred. Please try again.';
+    }
+}
+
 // Handle Doctor Operations
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['add_doctor'])) {
@@ -70,6 +114,7 @@ $doctors = $stmt->fetchAll();
                 <a href="admin.php" class="sidebar-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
                 <a href="manage_appointments.php" class="sidebar-link"><i class="fas fa-calendar-check"></i> Appointments</a>
                 <a href="medical-team.php" class="sidebar-link active"><i class="fas fa-user-md"></i> Medical Staff</a>
+                <a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#registerAdminModal"><i class="fa-solid fa-user"></i>Register New Admin</a>
                 <div class="mt-auto pt-4 border-top">
                     <a href="logout.php" class="sidebar-link text-danger"><i class="fas fa-power-off"></i> Sign Out</a>
                 </div>
@@ -154,6 +199,57 @@ $doctors = $stmt->fetchAll();
         </div>
     </div>
 
+    <!-- Register Admin Modal -->
+    <div class="modal fade" id="registerAdminModal" tabindex="-1" aria-labelledby="registerAdminModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post" action="medical-team.php">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="registerAdminModalLabel"><i class="fas fa-user-plus me-2"></i>Register New Admin</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <?php if (!empty($registerError)): ?>
+                            <div class="alert alert-danger small mb-3"><?php echo htmlspecialchars($registerError); ?></div>
+                        <?php endif; ?>
+                        <?php if (!empty($registerSuccess)): ?>
+                            <div class="alert alert-success small mb-3"><?php echo htmlspecialchars($registerSuccess); ?></div>
+                        <?php endif; ?>
+                        <?php if (isset($_GET['registered']) && $_GET['registered'] === '1'): ?>
+                            <div class="alert alert-success small mb-3">Admin user registered successfully!</div>
+                        <?php endif; ?>
+
+                        <div class="mb-3">
+                            <label for="reg_username" class="form-label">Username / Email</label>
+                            <input type="text" class="form-control" id="reg_username" name="reg_username" required placeholder="Enter username or email">
+                            <small class="text-muted">This will be used to login to the admin panel</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg_password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="reg_password" name="reg_password" required>
+                                <button type="button" class="btn btn-outline-secondary" id="toggle_reg_password">Show</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg_confirm_password" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="reg_confirm_password" name="reg_confirm_password" required>
+                                <button type="button" class="btn btn-outline-secondary" id="toggle_reg_confirm_password">Show</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="register_admin" value="1" class="btn btn-primary-custom">
+                            <i class="fas fa-user-plus me-1"></i>Register Admin
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Doctor Modal -->
     <div class="modal fade" id="editDoctorModal" tabindex="-1">
         <div class="modal-dialog">
@@ -196,6 +292,46 @@ $doctors = $stmt->fetchAll();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Setup password toggle functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            function setupPasswordToggle(inputId, buttonId) {
+                const input = document.getElementById(inputId);
+                const button = document.getElementById(buttonId);
+                if (!input || !button) return;
+
+                button.addEventListener('click', () => {
+                    const isPassword = input.type === 'password';
+                    input.type = isPassword ? 'text' : 'password';
+                    button.textContent = isPassword ? 'Hide' : 'Show';
+                });
+            }
+
+            setupPasswordToggle('reg_password', 'toggle_reg_password');
+            setupPasswordToggle('reg_confirm_password', 'toggle_reg_confirm_password');
+        });
+
+        <?php if (!empty($registerError) || !empty($registerSuccess)): ?>
+        // Re-open Register Admin modal after form submission if there was feedback
+        window.addEventListener('load', () => {
+            const modalEl = document.getElementById('registerAdminModal');
+            if (modalEl && window.bootstrap) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
+        <?php endif; ?>
+
+        <?php if (isset($_GET['registered']) && $_GET['registered'] === '1'): ?>
+        // Show Register Admin modal with success message
+        window.addEventListener('load', () => {
+            const modalEl = document.getElementById('registerAdminModal');
+            if (modalEl && window.bootstrap) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
+        <?php endif; ?>
+
         function openEditModal(doctor) {
             document.getElementById('edit_id').value = doctor.id;
             document.getElementById('edit_name').value = doctor.name;

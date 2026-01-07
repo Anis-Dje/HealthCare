@@ -31,9 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             header('Location: admin.php');
             exit;
-        } else {
-            header('Location: register.php?email=' . urlencode($email));
-            exit;
         }
     } catch (Throwable $e) {
         // Log detailed error for debugging
@@ -99,9 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <li class="nav-item"><a class="nav-link" href="departments.php">Departments</a></li>
                     <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
                 </ul>
-                <div class="nav-auth-btns d-none d-lg-flex">
-                    <a href="register.php" class="btn-register">Register</a>
-                </div>
                 <a href="emergency.php" class="emergency ms-lg-3">Emergency</a>
             </div>
         </div>
@@ -137,9 +131,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         Log In <i class="fas fa-sign-in-alt"></i>
                     </button>
                 </form>
-                <div class="auth-footer">
-                    Don't have an account? <a href="register.php">Sign Up</a>
-                </div>
             </div>
         </div>
     </section>
